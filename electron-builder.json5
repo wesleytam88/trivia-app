@@ -12,6 +12,10 @@
     artifactName: '${productName}_${version}.${ext}',
     target: ['dmg'],
   },
+  linux: {
+    target: ['AppImage'],
+    artifactName: '${productName}_${version}.${ext}',
+  },
   win: {
     target: [
       {
