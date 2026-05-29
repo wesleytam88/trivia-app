@@ -1,27 +1,17 @@
-# solid-vite-electron
+# Trivia App
 
-![result](./result.png)
-
-Inspired by [ch99q](https://github.com/ch99q/vite-solid-electron)
-
-Based on [electron-vite](https://github.com/electron-vite/vite-plugin-electron/tree/main/examples/quick-start)
-
-## Overview
-
-⚡️ SolidJS + Vite + TypeScript + Electron
-
-📦 Ready out of the box
-
-🔥 Hot reloading
+## Acknowledgements
+* Credit to [tgrassl](https://github.com/tgrassl/solid-vite-electron) for providing the boilerplate code
+* Credit to spykian@gmail.com for the original [python program](https://github.com/wesleytam88/Trivia-Program) this app is based on
 
 ## Installation
 
 ```bash
-# clone template without git history
-npx degit https://github.com/tgrassl/solid-vite-electron <folder_name>
+# clone repository
+git clone https://github.com/wesleytam88/trivia-app
 
 # open the project directory
-cd <folder_name>
+cd trivia-app
 
 # install dependencies
 npm install
@@ -48,9 +38,3 @@ npm run build
 ├── public                                   Static assets
 └── src                                      Renderer source code, your SolidJS application
 ```
-
-## Read more
-
-[vite-plugin-electron](https://github.com/electron-vite/vite-plugin-electron)
-
-[SolidJS](https://www.solidjs.com/)

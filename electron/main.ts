@@ -1,29 +1,19 @@
-process.env.DIST = join(__dirname, '../dist')
-process.env.PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST, '../public')
-
 import { join } from 'path'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow } from 'electron'
+
+process.env.DIST = join(__dirname, '../dist')
+
+// Hardware acceleration disabled for ease of development
+// Performance impact is negligible for this app
+app.disableHardwareAcceleration()
 
 let win: BrowserWindow | null
-// Here, you can also use other preload
-const preload = join(__dirname, './preload.js')
-const url = process.env.VITE_DEV_SERVER_URL
 
 function createWindow() {
-  win = new BrowserWindow({
-    icon: join(process.env.PUBLIC, 'logo.svg'),
-    title: 'Test',
-    webPreferences: {
-      preload,
-    },
-  })
+  // Window title defined in index.html
+  win = new BrowserWindow()
 
-  // Open links in the browser, not inside the application
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https:')) shell.openExternal(url)
-    return { action: 'deny' }
-  })
-
+  const url = process.env.VITE_DEV_SERVER_URL
   if (url) {
     win.loadURL(url)
     win.webContents.openDevTools()
@@ -35,7 +25,6 @@ function createWindow() {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
-
 
 app.whenReady().then(() => {
   createWindow()

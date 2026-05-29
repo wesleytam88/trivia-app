@@ -1,5 +1,3 @@
-/// <reference types="vite-plugin-electron/electron-env" />
-
 declare namespace NodeJS {
   interface ProcessEnv {
     /**
@@ -15,8 +13,8 @@ declare namespace NodeJS {
      * │
      * ```
      */
+
+    /** Path to the Vite-built renderer output (`dist/`) */
     DIST: string
-    /** /dist/ or /public/ */
-    PUBLIC: string
   }
 }
