@@ -1,4 +1,4 @@
-import { GameState } from "../electron/types/game";
+import { GameState } from "../shared/game";
 
 export function StartScreen(props: { onChangeState: (state: GameState) => void }) {
     return (
