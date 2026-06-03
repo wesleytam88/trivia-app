@@ -28,21 +28,21 @@ npm run build
 ```tree
 ├── build/                                  App icons for packaged builds
 ├── electron/                               Main-process code (Node.js)
-├── public/                                 Static assets
 │   └── main.ts                             Window creation, app lifecycle
-├── release/                                Generated after production build, contains executables
+├── public/                                 Static assets
+├── release/                                Generated after prod. build, contains executables
 │   └── {version}
 │       ├── {os}-{os_arch}                  Contains unpacked application executable
 │       └── {app_name}_{version}.{ext}      Installer for the application
-├── src/                                    Renderer source code, (SolidJS)
-|   └── App.tsx                             Root component, screen routing, player & board store 
-|   └── main.tsx                            Entry point, mounts App to DOM
 ├── sample_questions/                       Sample question boards and media for testing
 ├── shared/                                 Types shared between main and renderer
+├── src/                                    Renderer source code (SolidJS)
+|   └── App.tsx                             Root component: screen routing, player/board store
+|   └── main.tsx                            Entry point, mounts App to DOM
 ├── electron-builder.json5                  Electron packaging configuration
 ├── index.html                              HTML entry point, loads renderer
 ├── package-lock.json
 ├── package.json
 ├── tsconfig.json                           TypeScript compiler configuration
-└── vite.config.js                          Vite build configuration (SolidJS + Electron plugins)
+└── vite.config.js                          Vite build config (SolidJS + Electron plugins)
 ```
