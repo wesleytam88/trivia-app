@@ -28,6 +28,7 @@ npm run build
 ```tree
 ├── build/                                  App icons for packaged builds
 ├── electron/                               Main-process code (Node.js)
+├── public/                                 Static assets
 │   └── main.ts                             Window creation, app lifecycle
 ├── release/                                Generated after production build, contains executables
 │   └── {version}
