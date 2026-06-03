@@ -19,8 +19,6 @@ export function AddPlayers(props: AddPlayerProps) {
     onCleanup(() => stopListening());
 
     function addPlayer() {
-        console.log(name());
-        console.log(pendingName())
         const trimmed = name().trim();
         if (!trimmed) return;
 
@@ -81,6 +79,7 @@ export function AddPlayers(props: AddPlayerProps) {
                                     <td>
                                         <input
                                             type="text" 
+                                            value={player.name}
                                             onInput={e => updateName(
                                                 index(), 
                                                 e.currentTarget.value)

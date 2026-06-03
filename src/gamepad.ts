@@ -8,26 +8,29 @@ import { ButtonID } from "../shared/player";
  * and compare against the previous frame to detect new presses.
  * 
  * Button ID format:
- *   "{gamepadIndex}b{gamepadIndex}"
+ *   "{gamepadIndex}b{buttonIndex}"
  *   D-pad inputs appear as regular buttons (indices 12-15 on standard mapping).
  */
 
 /** Previous frame's active button IDs per gamepad index. */
 let prevState: Map<number, Set<ButtonID>> = new Map();
 
-/** ID returned by requestAnimationFrame(), used in cancelAnimationFrame(frameId).
- *  Null if loop isn't running.
+/** 
+ * ID returned by requestAnimationFrame(), used in cancelAnimationFrame(frameId).
+ * Null if loop isn't running.
  */
 let frameId: number | null = null;
 
-/** The callback provided by the caller.
- *  When a new press is detected, this gets called with the button ID.
- *  Null if nobody is listening.
+/** 
+ * The callback provided by the caller.
+ * When a new press is detected, this gets called with the button ID.
+ * Null if nobody is listening.
  */
 let onPress: ((buttonId: ButtonID) => void) | null = null;
 
-/** Read all currently pressed inputs across all gamepads.
- *  Returns a Set of button IDs (strings).
+/** 
+ * Read all currently pressed inputs across all gamepads.
+ * Returns a Set of button IDs (strings).
  */
 function readActiveInputs(): Map<number, Set<ButtonID>> {
     const active = new Map<number, Set<ButtonID>>;
@@ -52,9 +55,10 @@ function readActiveInputs(): Map<number, Set<ButtonID>> {
     return active;
 }
 
-/** One frame of the polling loo.
- *  Compares current inputs to previous frame and 
- *  fires the callback for any newly pressed button(s).
+/** 
+ * One frame of the polling loo.
+ * Compares current inputs to previous frame and 
+ * fires the callback for any newly pressed button(s).
  */
 function pollFrame() {
     const current = readActiveInputs();
@@ -73,13 +77,14 @@ function pollFrame() {
     frameId = requestAnimationFrame(pollFrame);
 }
 
-/** Start listening for new button presses.
- *  The callback fires once per press (on the frame the 
- *  button transitions from released to pressed).
- *  Call stopListening() to end.
+/** 
+ * Start listening for new button presses.
+ * The callback fires once per press (on the frame the 
+ * button transitions from released to pressed).
+ * Call stopListening() to end.
  */
 export function startListening(callback: (buttonId: ButtonID) => void): void {
-    stopListening();
+    stopListening();    // Saftey measure in case a previous session is still running
     onPress = callback;
     // Snapshot current state so buttons already held down don't immediately fire as new presses
     prevState = readActiveInputs();
@@ -96,9 +101,10 @@ export function stopListening(): void {
     prevState = new Map();
 }
 
-/** One-shot poll: returns all currently pressed button IDs.
- *  Useful for the buzz-in gameplay loop where you check 
- *  "is anyone pressing right now".
+/** 
+ * One-shot poll: returns all currently pressed button IDs.
+ * Useful for the buzz-in gameplay loop where you check 
+ * "is anyone pressing right now".
  */
 export function pollAllPressed(): ButtonID[] {
     const active = readActiveInputs();
