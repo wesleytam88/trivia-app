@@ -1,8 +1,8 @@
 import { createSignal, For, Show, onCleanup } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
-import { GameState } from "../shared/game";
-import { Player, ButtonID } from "../shared/player";
-import { startListening, stopListening } from "./gamepad";
+import { GameState } from "../../shared/game";
+import { Player, ButtonID } from "../../shared/player";
+import { startListening, stopListening } from "../gamepad";
 
 interface AddPlayerProps {
     players: Player[];
