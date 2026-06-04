@@ -2,28 +2,37 @@ import { createSignal, Switch, Match } from "solid-js";
 import { createStore } from "solid-js/store";
 import { GameState } from "../shared/game";
 import { Player } from "../shared/player";
-import { StartScreen } from "./StartScreen";
-import { AddPlayers } from "./AddPlayers";
+import { StartScreen } from "./components/StartScreen";
+import { AddPlayers } from "./components/AddPlayers";
+import { SelectBoardFiles } from "./components/SelectBoardFiles";
 
 export const App = () => {
     const [gameState, setGameState] = createSignal<GameState>("StartScreen");
     const [players, setPlayers] = createStore<Player[]>([]);
-
-    const onChangeState = (newState: GameState) => {
-        setGameState(newState);
-    }
+    const [questionFile, setQuestionFile] = createSignal<string | null>(null);
+    const [mediaFolder, setMediaFolder] = createSignal<string | null>(null);
 
     return (
-        <Switch fallback={<StartScreen onChangeState={onChangeState}/>}>
+        <Switch fallback={<StartScreen onChangeState={setGameState}/>}>
             <Match when={gameState() === "StartScreen"}>
-                <StartScreen onChangeState={onChangeState} />
+                <StartScreen onChangeState={setGameState} />
             </Match>
 
             <Match when={gameState() === "AddPlayers"}>
                 <AddPlayers 
                     players={players}
                     setPlayers={setPlayers}
-                    onChangeState={onChangeState}
+                    onChangeState={setGameState}
+                />
+            </Match>
+
+            <Match when={gameState() === "SelectBoardFiles"}>
+                <SelectBoardFiles 
+                    questionFile={questionFile()}
+                    setQuestionFile={setQuestionFile}
+                    mediaFolder={mediaFolder()}
+                    setMediaFolder={setMediaFolder}
+                    onChangeState={setGameState}
                 />
             </Match>
         </Switch>

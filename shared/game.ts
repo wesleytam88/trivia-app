@@ -1,1 +1,4 @@
-export type GameState = "StartScreen" | "AddPlayers"
+export type GameState = 
+    | "StartScreen"
+    | "AddPlayers"
+    | "SelectBoardFiles"
