@@ -28,7 +28,8 @@ npm run build
 ```tree
 ├── build/                                  App icons for packaged builds
 ├── electron/                               Main-process code (Node.js)
-│   └── main.ts                             Window creation, app lifecycle
+│   └── main.ts                             Window creation, app lifecycle, IPC handlers
+|   └── preload.ts                          IPC bridge between main and renderer (contextBridge)
 ├── public/                                 Static assets
 ├── release/                                Generated after prod. build, contains executables
 │   └── {version}
