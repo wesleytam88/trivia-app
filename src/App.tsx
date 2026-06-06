@@ -1,6 +1,6 @@
 import { createSignal, Switch, Match, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
-import { GameState } from "../shared/game";
+import { GameState, AudienceState } from "../shared/game";
 import { Player } from "../shared/player";
 import { StartScreen } from "./components/StartScreen";
 import { AddPlayers } from "./components/AddPlayers";
@@ -8,6 +8,17 @@ import { SelectBoardFiles } from "./components/SelectBoardFiles";
 import { AudienceApp } from "./components/AudienceApp";
 
 const windowType = new URLSearchParams(window.location.search).get("window");
+
+/** Map a GameState to the fedault AudienceState for that screen. */
+function defaultAudienceState(state: GameState): AudienceState {
+    switch (state) {
+        case "AddPlayers":
+            return { screen: "Text", text: "Adding Players" };
+        case "StartScreen":
+        case "SelectBoardFiles":
+            return { screen: "Text", text: "Setting up Game" };
+    }
+}
 
 export const App = () => {
     if (windowType === "audience") {
@@ -19,10 +30,13 @@ export const App = () => {
     const [questionFile, setQuestionFile] = createSignal<string | null>(null);
     const [mediaFolder, setMediaFolder] = createSignal<string | null>(null);
 
+    // Send initial state so the audience window gets it on startup
+    onMount(() => window.api.sendAudienceState(defaultAudienceState(gameState())));
+
     function changeState(newState: GameState) {
-        // Wrapper that also sends the game state to the audience window to sync
+        // Wrapper that also sends the state to the audience window to sync
         setGameState(newState);
-        window.api.sendGameState(newState);
+        window.api.sendAudienceState(defaultAudienceState(gameState()));
     }
 
     return (

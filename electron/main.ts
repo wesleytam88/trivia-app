@@ -78,10 +78,10 @@ ipcMain.handle('select-media-folder', async () => {
     return result.filePaths[0];
 });
 
-// Relay game state from host to audience window
-ipcMain.on('game-state', (_event, state) => {
+// Relay audience state from host to audience window
+ipcMain.on('audience-state', (_event, state) => {
     if (audienceWin && !audienceWin.isDestroyed())
-        audienceWin.webContents.send('game-state', state);
+        audienceWin.webContents.send('audience-state', state);
 });
 
 app.on('window-all-closed', () => {

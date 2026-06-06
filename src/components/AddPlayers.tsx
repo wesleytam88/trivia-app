@@ -25,6 +25,7 @@ export function AddPlayers(props: AddPlayerProps) {
         setPendingName(trimmed);
         setWaiting(true);
         setName("");
+        window.api.sendAudienceState({ screen: "WaitForAddPlayer", playerName: trimmed });
 
         startListening((buttonId: ButtonID) => {
             stopListening();
@@ -41,6 +42,7 @@ export function AddPlayers(props: AddPlayerProps) {
 
             setWaiting(false);
             setPendingName("");
+            window.api.sendAudienceState({ screen: "Text", text: "Adding Players" });
         });
     }
 
@@ -48,6 +50,7 @@ export function AddPlayers(props: AddPlayerProps) {
         stopListening();
         setWaiting(false);
         setPendingName("");
+        window.api.sendAudienceState({ screen: "Text", text: "Adding Players" });
     }
 
     function removePlayer(index: number) {
@@ -105,7 +108,7 @@ export function AddPlayers(props: AddPlayerProps) {
                 when={!waiting()}
                 fallback={
                     <div>
-                        <p>Press your button, {pendingName()}!</p>
+                        <p>Waiting for input</p>
                         <button onClick={cancelAdd}>Cancel</button>
                     </div>
                 }

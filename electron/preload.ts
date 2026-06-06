@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { GameState } from "../shared/game";
+import { AudienceState } from "../shared/game";
 
 contextBridge.exposeInMainWorld('api', {
     selectQuestionFile: (): Promise<string | null> => 
@@ -8,11 +8,11 @@ contextBridge.exposeInMainWorld('api', {
     selectMediaFolder: (): Promise<string | null> => 
         ipcRenderer.invoke('select-media-folder'),
 
-    // Host -> Main -> Audience game state relay
-    sendGameState: (state: GameState): void =>
-        ipcRenderer.send('game-state', state),
+    // Host -> Main -> Audience state relay
+    sendAudienceState: (state: AudienceState): void =>
+        ipcRenderer.send('audience-state', state),
 
-    recvGameState: (callback: (state: GameState) => void): void => {
-        ipcRenderer.on('game-state', (_event, state) => callback(state));
+    recvAudienceState: (callback: (state: AudienceState) => void): void => {
+        ipcRenderer.on('audience-state', (_event, state) => callback(state));
     },
 });

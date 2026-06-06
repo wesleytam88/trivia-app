@@ -1,10 +1,10 @@
-type GameState = import("../shared/game").GameState
+type AudienceState = import("../shared/game").AudienceState
 
 interface ElectronAPI {
     selectQuestionFile: () => Promise<string | null>;
     selectMediaFolder: () => Promise<string | null>;
-    sendGameState: (state: GameState) => void;
-    recvGameState: (callback: (state: GameState) => void) => void;
+    sendAudienceState: (state: AudienceState) => void;
+    recvAudienceState: (callback: (state: AudienceState) => void) => void;
 }
 
 declare interface Window {

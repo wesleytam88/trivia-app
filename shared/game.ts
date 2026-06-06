@@ -3,8 +3,10 @@ export type GameState =
     | "AddPlayers"
     | "SelectBoardFiles"
 
-export const audienceText: Record<GameState, string> = {
-    StartScreen: "Setting up Game",
-    AddPlayers: "Adding Players",
-    SelectBoardFiles: "Setting up Game"
-}
+/** 
+ * Discriminated union containing the screen and 
+ * all the data needed to render that screen.
+ */
+export type AudienceState = 
+    | { screen: "Text"; text: string }
+    | { screen: "WaitForAddPlayer"; playerName: string }    // Waiting for player to buzz in to be added
