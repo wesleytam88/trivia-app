@@ -2,6 +2,7 @@ import { createSignal, Switch, Match, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { GameState, AudienceState } from "../shared/game";
 import { Player } from "../shared/player";
+import { PlayerList } from "./components/PlayerList";
 import { StartScreen } from "./components/StartScreen";
 import { AddPlayers } from "./components/AddPlayers";
 import { SelectBoardFiles } from "./components/SelectBoardFiles";
@@ -40,28 +41,31 @@ export const App = () => {
     }
 
     return (
-        <Switch fallback={<StartScreen onChangeState={changeState}/>}>
-            <Match when={gameState() === "StartScreen"}>
-                <StartScreen onChangeState={changeState} />
-            </Match>
+        <div style={{ display: "flex" }}>
+            <Switch fallback={<StartScreen onChangeState={changeState}/>}>
+                <Match when={gameState() === "StartScreen"}>
+                    <StartScreen onChangeState={changeState} />
+                </Match>
 
-            <Match when={gameState() === "AddPlayers"}>
-                <AddPlayers 
-                    players={players}
-                    setPlayers={setPlayers}
-                    onChangeState={changeState}
-                />
-            </Match>
+                <Match when={gameState() === "AddPlayers"}>
+                    <AddPlayers 
+                        players={players}
+                        setPlayers={setPlayers}
+                        onChangeState={changeState}
+                    />
+                </Match>
 
-            <Match when={gameState() === "SelectBoardFiles"}>
-                <SelectBoardFiles 
-                    questionFile={questionFile()}
-                    setQuestionFile={setQuestionFile}
-                    mediaFolder={mediaFolder()}
-                    setMediaFolder={setMediaFolder}
-                    onChangeState={changeState}
-                />
-            </Match>
-        </Switch>
+                <Match when={gameState() === "SelectBoardFiles"}>
+                    <SelectBoardFiles 
+                        questionFile={questionFile()}
+                        setQuestionFile={setQuestionFile}
+                        mediaFolder={mediaFolder()}
+                        setMediaFolder={setMediaFolder}
+                        onChangeState={changeState}
+                    />
+                </Match>
+            </Switch>
+            <PlayerList players={players} setPlayers={setPlayers} />
+        </div>
     );
 }

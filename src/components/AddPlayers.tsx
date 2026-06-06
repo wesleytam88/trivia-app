@@ -1,4 +1,4 @@
-import { createSignal, For, Show, onCleanup } from "solid-js";
+import { createSignal, Show, onCleanup } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import { GameState } from "../../shared/game";
 import { Player, ButtonID } from "../../shared/player";
@@ -53,55 +53,9 @@ export function AddPlayers(props: AddPlayerProps) {
         window.api.sendAudienceState({ screen: "Text", text: "Adding Players" });
     }
 
-    function removePlayer(index: number) {
-        props.setPlayers(prev => prev.filter((_, i) => i !== index));
-    }
-
-    function updateName(index: number, newName: string) {
-        props.setPlayers(index, "name", newName);
-    }
-
     return (
         <div>
             <h1>Players</h1>
-
-            {/* Player list */}
-            <Show when={props.players.length > 0}>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Points</th>
-                            <th>Button Id</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <For each={props.players}>
-                            {(player, index) => 
-                                <tr>
-                                    <td>
-                                        <input
-                                            type="text" 
-                                            value={player.name}
-                                            onInput={e => updateName(
-                                                index(), 
-                                                e.currentTarget.value)
-                                            }
-                                        />
-                                    </td>
-                                    <td>{player.points}</td>
-                                    <td>{player.id}</td>
-                                    <td>
-                                        <button onClick={() => removePlayer(index())}>
-                                            X
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </For>
-                    </tbody>
-                </table>
-            </Show>
 
             {/* Add player form / waiting state */}
             <Show
