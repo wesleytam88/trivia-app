@@ -24,6 +24,7 @@
     "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
-    "solid-js": "^1.9.13"
+    "solid-js": "^1.9.13",
+    "xlsx": "^0.18.5"
   }
 }

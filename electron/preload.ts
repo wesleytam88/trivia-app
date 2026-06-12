@@ -1,5 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { AudienceState } from "../shared/game";
+import { Board } from "../shared/board";
+
+type ParseResult = { boards: Board[] } | { error: string };
 
 contextBridge.exposeInMainWorld('api', {
     selectQuestionFile: (): Promise<string | null> => 
@@ -7,6 +10,9 @@ contextBridge.exposeInMainWorld('api', {
 
     selectMediaFolder: (): Promise<string | null> => 
         ipcRenderer.invoke('select-media-folder'),
+
+    parseQuestionFile: (filePath: string): Promise<ParseResult> => 
+        ipcRenderer.invoke('parse-question-file', (filePath)),
 
     // Host -> Main -> Audience state relay
     sendAudienceState: (state: AudienceState): void =>

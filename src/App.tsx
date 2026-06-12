@@ -10,7 +10,7 @@ import { AudienceApp } from "./components/AudienceApp";
 
 const windowType = new URLSearchParams(window.location.search).get("window");
 
-/** Map a GameState to the fedault AudienceState for that screen. */
+/** Map a GameState to the default AudienceState for that screen. */
 function defaultAudienceState(state: GameState): AudienceState {
     switch (state) {
         case "AddPlayers":
@@ -18,6 +18,8 @@ function defaultAudienceState(state: GameState): AudienceState {
         case "StartScreen":
         case "SelectBoardFiles":
             return { screen: "Text", text: "Setting up Game" };
+        default:
+            return { screen: "Text", text: "ERROR: Game state not found!" }
     }
 }
 
@@ -30,6 +32,7 @@ export const App = () => {
     const [players, setPlayers] = createStore<Player[]>([]);
     const [questionFile, setQuestionFile] = createSignal<string | null>(null);
     const [mediaFolder, setMediaFolder] = createSignal<string | null>(null);
+    const [boards, setBoards] = createSignal<Board[]>([]);
 
     // Send initial state so the audience window gets it on startup
     onMount(() => window.api.sendAudienceState(defaultAudienceState(gameState())));
@@ -61,6 +64,8 @@ export const App = () => {
                         setQuestionFile={setQuestionFile}
                         mediaFolder={mediaFolder()}
                         setMediaFolder={setMediaFolder}
+                        boards={boards()}
+                        setBoards={setBoards}
                         onChangeState={changeState}
                     />
                 </Match>

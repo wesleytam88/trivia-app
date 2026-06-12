@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { parseQuestionFile } from './parseQuestion';
 
 process.env.DIST = join(__dirname, '../dist');
 
@@ -76,6 +77,15 @@ ipcMain.handle('select-media-folder', async () => {
 
     if (result.canceled || result.filePaths.length !== 1) return null;
     return result.filePaths[0];
+});
+
+ipcMain.handle('parse-question-file', async (_event, filePath: string) => {
+    try {
+        return { boards: parseQuestionFile(filePath) };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { error: `Failed to parse question file: ${message}` };
+    }
 });
 
 // Relay audience state from host to audience window

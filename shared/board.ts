@@ -19,12 +19,14 @@ export interface Question {
     /** Point value of the question */
     value: number
 
-    /** How long players are given to answer the question */
+    /** 
+     * Extra time offset in seconds. 
+     * Added to the base question timer. Can be negative. */
     time: number
 
     /**
-     * Optional media for the question screen (video and/or audio).
-     * Can be an https link or a local file path.
+     * Media for the question screen (video and/or audio).
+     * Can be an https link or a local file path. Empty if no media.
      */
-    media?: string
+    media: string[]
 }
