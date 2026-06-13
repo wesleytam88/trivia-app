@@ -1,15 +1,18 @@
-export interface Board {
+/** Return type of parsing the xlsx/csv file in the IPC handler */
+export type ParseResult = { boards: Board[] } | { error: string }
+
+export type Board = {
     id: string
     categories: Category[]
 }
 
-export interface Category {
+export type Category = {
     name: string
     description: string
     questions: Question[]
 }
 
-export interface Question {
+export type Question = {
     /** Question text */
     text: string
 

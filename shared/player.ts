@@ -1,6 +1,6 @@
 export type ButtonID = string;
 
-export interface Player {
+export type Player = {
     id: ButtonID;
     name: string;
     points: number;

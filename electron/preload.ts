@@ -1,8 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { AudienceState } from "../shared/game";
-import { Board } from "../shared/board";
-
-type ParseResult = { boards: Board[] } | { error: string };
+import { ParseResult } from "../shared/board";
 
 contextBridge.exposeInMainWorld('api', {
     selectQuestionFile: (): Promise<string | null> => 

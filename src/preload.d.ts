@@ -1,7 +1,5 @@
-type AudienceState = import("../shared/game").AudienceState
-type Board = import("../shared/board").Board
-
-type ParseResult = { boards: Board[] } | { error: string };
+type AudienceState = import("../shared/game").AudienceState;
+type ParseResult = import("../shared/board").ParseResult;
 
 interface ElectronAPI {
     selectQuestionFile: () => Promise<string | null>;
