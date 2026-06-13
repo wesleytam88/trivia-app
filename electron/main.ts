@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
-import { parseQuestionFile } from './parseQuestion';
+import { parseQuestionFile } from './parseFile';
 
 process.env.DIST = join(__dirname, '../dist');
 

@@ -3,17 +3,15 @@ import { Board, Category, Question } from '../shared/board';
 import { readFileSync } from 'fs';
 
 /**
- * Parse a question file (.xlsx or .csv) into Board[].
- * 
- * Expected columns (header row is skipped):
- *   A: Board name    - blank = continue previous board
- *   B: Category name - blank = continue previous category
- *   C: Desription    - category description
- *   D: Points        - question point value
- *   E: Question text
- *   F: Answer text
- *   G: Extra time    - seconds added to base timer (can be <0)
- *   H: Files         - comma-separated media filenames
+ * Parse a .xlsx or .csv file into Board[]. Expected columns:
+ *  - A: Board name (blank = continue previous board)
+ *  - B: Category name (blank = continue previous category)
+ *  - C: Category Desription
+ *  - D: Points (blank = skip row/question)
+ *  - E: Question text
+ *  - F: Answer text
+ *  - G: Extra time (seconds added to base timer, can be negative)
+ *  - H: Files (comma-separated media filenames)
  */
 export function parseQuestionFile(filePath: string): Board[] {
     const buffer = readFileSync(filePath);
