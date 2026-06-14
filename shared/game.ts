@@ -2,6 +2,7 @@ export type GameState =
     | "StartScreen"
     | "AddPlayers"
     | "SelectBoardFiles"
+    | "BoardView"
 
 /** 
  * Discriminated union containing the screen and 

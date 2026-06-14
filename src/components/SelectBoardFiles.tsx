@@ -38,7 +38,13 @@ export function SelectBoardFiles(props: SelectBoardFileProps) {
         if ('error' in result)
             throw new Error("Error when parsing question file");
 
+        // Check if there are any missing media files
+        const missing = await window.api.validateMediaFiles(result.boards, props.mediaFolder);
+        if (missing.length > 0)
+            console.log("Files missing: ", missing);
+
         props.setBoards(result.boards);
+        props.onChangeState("BoardView");
     }
 
     return (

@@ -1,6 +1,14 @@
 import * as XLSX from 'xlsx';
 import { Board, Category, Question } from '../shared/board';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
+
+/** Coerce a cell value to a trimmed string, or undefined if blank/missing */
+function str(value: string | number | undefined): string | undefined {
+    if (value === undefined || value === null) return undefined;
+    const s = String(value).trim();
+    return s.length > 0 ? s : undefined;
+}
 
 /**
  * Parse a .xlsx or .csv file into Board[]. Expected columns:
@@ -106,9 +114,23 @@ export function parseQuestionFile(filePath: string): Board[] {
     return boards;
 }
 
-/** Coerce a cell value to a trimmed string, or undefined if blank/missing */
-function str(value: string | number | undefined): string | undefined {
-    if (value === undefined || value === null) return undefined;
-    const s = String(value).trim();
-    return s.length > 0 ? s : undefined;
+/** 
+ * Validates that all media files are present in the media folder.
+ * Returns a list of missing media files.
+ */
+export function validateMediaFiles(boards: Board[], mediaFolder: string): string[] {
+    const missing: string[] = [];
+
+    boards.forEach(board => {
+        board.categories.forEach(category => {
+            category.questions.forEach(question => {
+                question.media.forEach(filename => {
+                    const path = join(mediaFolder, filename);
+                    if (!existsSync(path)) missing.push(path);
+                });
+            });
+        });
+    });
+
+    return missing;
 }
