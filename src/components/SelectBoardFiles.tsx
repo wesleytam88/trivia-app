@@ -1,4 +1,4 @@
-import { Setter } from "solid-js";
+import { createSignal, Setter, Show } from "solid-js";
 import { GameState } from "../../shared/game";
 import { Board } from "../../shared/board";
 
@@ -18,6 +18,8 @@ function basename(path: string): string {
 }
 
 export function SelectBoardFiles(props: SelectBoardFileProps) {
+    const [errMsg, setErrMsg] = createSignal<string>("");
+
     async function selectFile() {
         const path = await window.api.selectQuestionFile();
         if (path) props.setQuestionFile(path);
@@ -29,19 +31,31 @@ export function SelectBoardFiles(props: SelectBoardFileProps) {
     }
 
     async function startGame() {
-        if (!props.questionFile) throw new Error("Error: Question file not found!");
-        if (!props.mediaFolder) throw new Error("Error: Media folder not found!");
-        const result = await window.api.parseQuestionFile(props.questionFile);
+        if (!props.questionFile) {
+            setErrMsg("Error: Question file not found!");
+            throw new Error("Error: Question file not found!");
+        }
 
+        if (!props.mediaFolder) {
+            setErrMsg("Error: Media folder not found!");
+            throw new Error("Error: Media folder not found!");
+        }
+
+        const result = await window.api.parseQuestionFile(props.questionFile);
         console.log(result);
 
-        if ('error' in result)
+        if ('error' in result) {
+            setErrMsg(`Error when parsing question file: ${result.error}`);
             throw new Error("Error when parsing question file");
+        }
 
         // Check if there are any missing media files
         const missing = await window.api.validateMediaFiles(result.boards, props.mediaFolder);
-        if (missing.length > 0)
-            console.log("Files missing: ", missing);
+        if (missing.length > 0) {
+            const missingNames = missing.map(basename);
+            setErrMsg(`Missing media files: ${missingNames.join(", ")}`);
+            throw new Error(`Missing media files: ${missingNames}`);
+        }
 
         props.setBoards(result.boards);
         props.onChangeState("BoardView");
@@ -67,6 +81,11 @@ export function SelectBoardFiles(props: SelectBoardFileProps) {
             </div>
             <button onClick={() => props.onChangeState("StartScreen")}>Back</button>
             <button onClick={() => startGame()}>Play</button>
+            <Show when={errMsg() !== ""}>
+                <p style={{ color: "red" }}>
+                    {errMsg()}
+                </p>
+            </Show>
         </div>
     );
 }
