@@ -105,7 +105,8 @@ export function parseQuestionFile(filePath: string): Board[] {
             answer: rawAnswer ?? '',
             value: points,
             time: time,
-            media: media
+            media: media,
+            answered: false
         };
 
         currCategory.questions.push(question);

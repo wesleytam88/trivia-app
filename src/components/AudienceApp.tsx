@@ -1,5 +1,6 @@
 import { createSignal, onMount, Switch, Match } from "solid-js";
 import { AudienceState } from "../../shared/game";
+import { BoardGrid } from "./BoardGrid";
 
 export function AudienceApp() {
     const [state, setState] = createSignal<AudienceState>({ screen: "Text", text: "Setting up Game" });
@@ -27,6 +28,10 @@ export function AudienceApp() {
 
             <Match when={screenIs("WaitForAddPlayer")}>
                 {s => <p>Press your button, {s().playerName}!</p>}
+            </Match>
+
+            <Match when={screenIs("AudienceBoardView")}>
+                {s => <BoardGrid board={s().board} />}
             </Match>
         </Switch>
     );

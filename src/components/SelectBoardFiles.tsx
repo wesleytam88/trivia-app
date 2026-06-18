@@ -1,4 +1,5 @@
 import { createSignal, Setter, Show } from "solid-js";
+import { SetStoreFunction, reconcile } from "solid-js/store";
 import { GameState } from "../../shared/game";
 import { Board } from "../../shared/board";
 
@@ -8,7 +9,7 @@ interface SelectBoardFileProps {
     mediaFolder: string | null;
     setMediaFolder: Setter<string | null>;
     boards: Board[];
-    setBoards: Setter<Board[]>;
+    setBoards: SetStoreFunction<Board[]>;
     onChangeState: (state: GameState) => void;
 }
 
@@ -57,7 +58,7 @@ export function SelectBoardFiles(props: SelectBoardFileProps) {
             throw new Error(`Missing media files: ${missingNames}`);
         }
 
-        props.setBoards(result.boards);
+        props.setBoards(reconcile(result.boards));
         props.onChangeState("BoardView");
     }
 

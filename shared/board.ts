@@ -32,4 +32,7 @@ export type Question = {
      * Can be an https link or a local file path. Empty if no media.
      */
     media: string[]
+
+    /** Whether the question has already been played */
+    answered: boolean
 }
