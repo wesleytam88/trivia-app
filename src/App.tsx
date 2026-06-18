@@ -1,4 +1,4 @@
-import { createSignal, Switch, Match, onMount } from "solid-js";
+import { createSignal, Switch, Match, createEffect } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import { GameState, AudienceState } from "../shared/game";
 import { Board, Category, Question } from "../shared/board";
@@ -26,6 +26,9 @@ function defaultAudienceState(state: GameState, boards?: Board[], boardIndex?: n
                 return { screen: "Text", text: "No board loaded" };
             // unwrap strips SolidJS store Proxy so object can be structure-cloned across Electron IPC
             return { screen: "AudienceBoardView", board: unwrap(board) };
+        case "FinalScores":
+            // TODO: Implement final scores
+            return { screen: "Text", text: "Final Scores"}
         default:
             return { screen: "Text", text: "ERROR: Game state not found!" }
     }
@@ -43,28 +46,20 @@ export const App = () => {
     const [boards, setBoards] = createStore<Board[]>([]);
     const [currBoardIndex, setCurrBoardIndex] = createSignal(0);
 
-    // Send initial state so the audience window gets it on startup
-    onMount(() => window.api.sendAudienceState(defaultAudienceState(gameState())));
-
-    /** Send the current board state to the audience window */
-    function syncAudienceBoard() {
-        window.api.sendAudienceState(
-            defaultAudienceState(gameState(), boards, currBoardIndex())
-        );
-    }
+    // Automatically track changes in game state and update the audience window
+    createEffect(() => {
+        const newState = defaultAudienceState(gameState(), boards, currBoardIndex());
+        window.api.sendAudienceState(newState);
+    });
 
     function changeState(newState: GameState) {
-        // Wrapper that also sends the state to the audience window to sync
+        // Will also update the audience window via the effect above
         setGameState(newState);
-        window.api.sendAudienceState(
-            defaultAudienceState(gameState(), boards, currBoardIndex())
-        );
     }
 
     function handleSelectQuestion(categoryIndex: number, questionIndex: number) {
         const boardIndx = currBoardIndex();
         setBoards(boardIndx, "categories", categoryIndex, "questions", questionIndex, "answered", true);
-        syncAudienceBoard();
 
         // Check if all questions on the current board are answered
         const board = boards[boardIndx];
@@ -75,11 +70,8 @@ export const App = () => {
         if (allAnswered) {
             if (boardIndx + 1 < boards.length) {
                 setCurrBoardIndex(boardIndx + 1);
-                syncAudienceBoard();
-            }
-            else {
-                // TODO: Implement final scores screen
-                window.api.sendAudienceState({ screen: "Text", text: "Final Scores" })
+            } else {
+                setGameState("FinalScores");
             }
         }
     }
@@ -116,6 +108,11 @@ export const App = () => {
                         board={boards[currBoardIndex()]}
                         onSelectQuestion={handleSelectQuestion}
                     />
+                </Match>
+
+                <Match when={gameState() === "FinalScores"}>
+                    {/* TODO: Implement final scores */}
+                    <p>Final Scores</p>
                 </Match>
             </Switch>
             <PlayerList players={players} setPlayers={setPlayers} />

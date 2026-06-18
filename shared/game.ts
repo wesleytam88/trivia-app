@@ -5,6 +5,7 @@ export type GameState =
     | "AddPlayers"
     | "SelectBoardFiles"
     | "BoardView"
+    | "FinalScores"
 
 /** Discriminated union containing the screen and all the data needed to render that screen */
 export type AudienceState = 
