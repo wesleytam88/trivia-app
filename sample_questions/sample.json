@@ -1,0 +1,391 @@
+[
+  {
+    "id": "Board 1",
+    "categories": [
+      {
+        "name": "Transportmation",
+        "description": "Name the Show given the desciption of a unique modem of transportation used by a main character, name the SHOW",
+        "questions": [
+          {
+            "text": "Red Motorcycle with US Airforce Sticker",
+            "answer": "Kaneda, Shoutarou, Akira",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Panzer IV Ausf.D",
+            "answer": "Miho Nishizumi, Girls und Panzer",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Rollerskates and tentacles",
+            "answer": "Yuri, Alien 9",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Single Wheeled Segway",
+            "answer": "Warp/Chroniko, Kaiba",
+            "value": 400,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Toyota 2000GT",
+            "answer": "Mabuchi Kyouma, Dimension W",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "I Can't Believe These Aren't Really Light Novels",
+        "description": "Given the ridiculous light novel-esque fake title, name the show it's referring to",
+        "questions": [
+          {
+            "text": "I Beat Everything In One Punch, So I Might As Well Be A Superhero!",
+            "answer": "One Punch Man",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Earth Is Under Attack By Holy Aliens!? And My Dad's Making Me Fight Them In A Robot!?!!?!",
+            "answer": "Neon Genesis Evangelion",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "The Lord Of The Underworld Arrives To Sell You High-Carb Burgers!",
+            "answer": "Hataraku Maou-Sama! / The Devil Is A Part-Timer!",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Humanoid Cephalopods Are Rising From The Depths To Conquer The Surface World! But They're Actually Just Working At A Seaside Restaurant!?",
+            "answer": "Shinryaku! Ika Musume / Squid Girl",
+            "value": 400,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "This Magic Bird-Hat Keeps Our Dying Sister Alive, And Basically The Apple Is The Universe Itself",
+            "answer": "Mawaru Penguindrum",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "No Superpower Left Unnamed",
+        "description": "Given the name of a \"power\" (superpower, etc.), name the anime that the power is from.",
+        "questions": [
+          {
+            "text": "Reading Steiner",
+            "answer": "Steins;Gate",
+            "value": 100,
+            "time": -5,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Return by Death",
+            "answer": "Re:ZERO-Starting Life in Anothere World",
+            "value": 200,
+            "time": -5,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Dark and Dark",
+            "answer": "When Supernatural Battles Become Commonplace (Inou-Battle)",
+            "value": 300,
+            "time": -5,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Devil's Satan Hellhound Grenda's Kind Hand",
+            "answer": "Inferno Cop",
+            "value": 400,
+            "time": -5,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Mental Out",
+            "answer": "A Certain Scientific Railgun/A Certain Magical Index",
+            "value": 500,
+            "time": -5,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "Sound",
+        "description": "Name the show given the opening",
+        "questions": [
+          {
+            "text": "Name the opening",
+            "answer": "Acca 13",
+            "value": 100,
+            "time": 10,
+            "media": [
+              "ACCA-OP1-NCBD1080.wav"
+            ],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "Images",
+        "description": "Name the Anime",
+        "questions": [
+          {
+            "text": "Name the Anime",
+            "answer": "SNAFU",
+            "value": 99999,
+            "time": 0,
+            "media": [
+              "Yui Yuigahama - My Teen Romantic Comedy SNAFU.png"
+            ],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "Video",
+        "description": "Name the Anime",
+        "questions": [
+          {
+            "text": "Name the Anime",
+            "answer": "Gurren Lagann",
+            "value": 100,
+            "time": 0,
+            "media": [
+              "gurren_lagann.mp4"
+            ],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "Video and Sound",
+        "description": "Name the Anime",
+        "questions": [
+          {
+            "text": "Name the Anime",
+            "answer": "Gurren Lagann, Acca 13",
+            "value": 100,
+            "time": 0,
+            "media": [
+              "gurren_lagann.mp4",
+              "ACCA-OP1-NCBD1080.wav"
+            ],
+            "answered": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "Board 2",
+    "categories": [
+      {
+        "name": "Make Anime Great Again",
+        "description": "Given the description of the American anime character, name the character.",
+        "questions": [
+          {
+            "text": "This duelist really loves America and will cheat to win in something as trivial as childrens' card games.",
+            "answer": "Bandit Keith Howard (Yu-Gi-Oh!)",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "A Chinese-American working for the Lagoon Company. Don't get on this foul-mouthed girl's bad side, unless you want a pair of bullets from her twin custom Beretta pistols to the face.",
+            "answer": "Rebecca \"Revy\" Lee (Black Lagoon)",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "This GHQ Colonel and former football coach is pretty resourceful; tipping anti-air missle launchers on their sides to fire them horizontally takes a bit of creativity. Loves giving pep talks.",
+            "answer": "Dan Eagleman (Guilty Crown)",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "This UN Spacey pilot flies a VF-1S Valkyrie. In between carrying out his duties as the leader of Skull Squadron, he mentors Hikaru Ichijou to become a great variable fighter pilot.",
+            "answer": "Roy Focker (Super Dimension Fortress Macross)",
+            "value": 400,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "This researcher and her co-workers from MIT believe that Squid Girl is an alien, and she attempts to squidnap her for research purposes.",
+            "answer": "Cindy Campbell (Squid Girl)",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "I Swear Mom, it's Not Porn!",
+        "description": "Given the description of the very \"plot-driven\" anime, name the anime",
+        "questions": [
+          {
+            "text": "Competitive high school swimming. With dudes.",
+            "answer": "Free!",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Competitive boob and butt water wrestling. With Girls.",
+            "answer": "Keijo!!!!!!!!",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Escape the zombie - filled high school. With guns.",
+            "answer": "High School of the Dead",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Stripping the clothes off of vampires to kill them. In Akihabara.",
+            "answer": "Akiba's Trip The Animation",
+            "value": 400,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Surviving the rough prison life. In high school.",
+            "answer": "Prison School",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "But How Much of It Is Filler?",
+        "description": "Given the name of the anime with an unorthodox episode count, state the number of normal episodes in the show (no specials, OVAs, or movies included in show count)",
+        "questions": [
+          {
+            "text": "Konosuba",
+            "answer": "10",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Cardcaptor Sakura",
+            "answer": "70",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Nisemonogatari",
+            "answer": "11",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Great Teacher Onizuka",
+            "answer": "43",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      },
+      {
+        "name": "Slice My Life Into Pieces",
+        "description": "Name the described slice-of-life show",
+        "questions": [
+          {
+            "text": "High school girls are in a club where they eat cake and drink tea... and occasionally play music",
+            "answer": "K-On!",
+            "value": 100,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "You can tell it's the countryside because the school only has 5 students and 3 of them are related.",
+            "answer": "Non Non Biyori",
+            "value": 200,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "After punching an old guy, a calligrapher from Tokyo takes an extended vacation on an island to calm down",
+            "answer": "Barakamon",
+            "value": 300,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "This wacky restaurant workplace features, among others, an androphobe, a diminutive high schooler, and a guy who probably likes small things a little too much.",
+            "answer": "Working!! / Wagnaria!!",
+            "value": 400,
+            "time": 0,
+            "media": [],
+            "answered": false
+          },
+          {
+            "text": "Kanji Sasahara discovers his college's Society for the Study of Modern Visual Culture, a club for otaku to do anime-related things",
+            "answer": "Genshiken",
+            "value": 500,
+            "time": 0,
+            "media": [],
+            "answered": false
+          }
+        ]
+      }
+    ]
+  }
+]

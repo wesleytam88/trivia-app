@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 /** Coerce a cell value to a trimmed string, or undefined if blank/missing */
-function str(value: string | number | undefined): string | undefined {
+export function str(value: string | number | undefined): string | undefined {
     if (value === undefined || value === null) return undefined;
     const s = String(value).trim();
     return s.length > 0 ? s : undefined;
