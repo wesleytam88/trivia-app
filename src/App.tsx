@@ -1,4 +1,4 @@
-import { createSignal, Switch, Match, createEffect } from "solid-js";
+import { createSignal, Switch, Match, onMount } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import { GameState, AudienceState } from "../shared/game";
 import { Board, Category, Question } from "../shared/board";
@@ -46,20 +46,27 @@ export const App = () => {
     const [boards, setBoards] = createStore<Board[]>([]);
     const [currBoardIndex, setCurrBoardIndex] = createSignal(0);
 
-    // Automatically track changes in game state and update the audience window
-    createEffect(() => {
-        const newState = defaultAudienceState(gameState(), boards, currBoardIndex());
-        window.api.sendAudienceState(newState);
-    });
+    // Send initial state so the audience window gets it on startup
+    onMount(() => window.api.sendAudienceState(defaultAudienceState(gameState())));
 
-    function changeState(newState: GameState) {
-        // Will also update the audience window via the effect above
-        setGameState(newState);
+    /** Send the current board state to the audience window */
+    function syncAudienceWindow() {
+        window.api.sendAudienceState(
+            defaultAudienceState(gameState(), boards, currBoardIndex())
+        );
     }
 
+    /** Wrapper that also sends the state to the audience window to sync */
+    function changeState(newState: GameState) {
+        setGameState(newState);
+        syncAudienceWindow();
+    }
+
+    /** Logic to handle clicking on a question cell */
     function handleSelectQuestion(categoryIndex: number, questionIndex: number) {
         const boardIndx = currBoardIndex();
         setBoards(boardIndx, "categories", categoryIndex, "questions", questionIndex, "answered", true);
+        syncAudienceWindow();
 
         // Check if all questions on the current board are answered
         const board = boards[boardIndx];
@@ -70,8 +77,9 @@ export const App = () => {
         if (allAnswered) {
             if (boardIndx + 1 < boards.length) {
                 setCurrBoardIndex(boardIndx + 1);
+                syncAudienceWindow();
             } else {
-                setGameState("FinalScores");
+                changeState("FinalScores");
             }
         }
     }
