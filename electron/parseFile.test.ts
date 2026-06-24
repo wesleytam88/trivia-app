@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect } from 'vitest';
 import { str, parseQuestionFile, validateMediaFiles } from './parseFile';
 import sample from '../sample_questions/sample.json';
 import { fileURLToPath } from 'url';
@@ -86,11 +86,25 @@ describe('validateMediaFiles()', () => {
                                 "answered": false
                             }
                         ]
+                    },
+                    {
+                        "name": "Test Category 2",
+                        "description": "Test Description 2",
+                        "questions": [
+                            {
+                                "text": "Test Question 3",
+                                "answer": "Test Answer",
+                                "value": 100,
+                                "time": 0,
+                                "media": ["image.webp"],
+                                "answered": false
+                            }
+                        ]
                     }
                 ]
             }
         ];
         expect(validateMediaFiles(boards, mediaFolder))
-            .toEqual(["image.png", "audio.mp3", "video.mp4"]);
+            .toEqual(["image.png", "audio.mp3", "video.mp4", "image.webp"]);
     });
 });
