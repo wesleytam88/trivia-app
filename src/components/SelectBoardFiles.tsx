@@ -1,7 +1,7 @@
 import { createSignal, Setter, Show } from "solid-js";
 import { SetStoreFunction, reconcile } from "solid-js/store";
 import { GameState } from "../../shared/game";
-import { Board } from "../../shared/board";
+import { Board, basename } from "../../shared/board";
 
 interface SelectBoardFileProps {
     questionFile: string | null;
@@ -11,11 +11,6 @@ interface SelectBoardFileProps {
     boards: Board[];
     setBoards: SetStoreFunction<Board[]>;
     onChangeState: (state: GameState) => void;
-}
-
-/** Extract the file or folder name from a full path. */
-function basename(path: string): string {
-    return path.split(/[/\\]/).pop() ?? path;
 }
 
 export function SelectBoardFiles(props: SelectBoardFileProps) {

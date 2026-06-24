@@ -36,3 +36,8 @@ export type Question = {
     /** Whether the question has already been played */
     answered: boolean
 }
+
+/** Extract the file or folder name from a full path. */
+export function basename(path: string): string {
+    return path.split(/[/\\]/).pop() ?? path;
+}

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { str, parseQuestionFile } from './parseFile';
+import { str, parseQuestionFile, validateMediaFiles } from './parseFile';
 import sample from '../sample_questions/sample.json';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -48,5 +48,49 @@ describe('parseQuestionFile()', () => {
         const csvFile = join(_dirname, '..', 'sample_questions', 'sample.csv');
         const boards = parseQuestionFile(csvFile);
         expect(boards).toEqual(sample);
+    });
+});
+
+describe('validateMediaFiles()', () => {
+    test('Test sample for missing media', () => {
+        const xlsxFile = join(_dirname, '..', 'sample_questions', 'sample.xlsx');
+        const boards = parseQuestionFile(xlsxFile);
+        const mediaFolder = join(_dirname, '..', 'sample_questions', 'media');
+        expect(validateMediaFiles(boards, mediaFolder)).toEqual([]);
+    });
+
+    test('Test actually missing media', () => {
+        const mediaFolder = join(_dirname, '..', 'sample_questions', 'media');
+        const boards = [
+            {
+                "id": "Board 1",
+                "categories": [
+                    {
+                        "name": "Test Category",
+                        "description": "Test Description",
+                        "questions": [
+                            {
+                                "text": "Test Question 1",
+                                "answer": "Test Answer",
+                                "value": 100,
+                                "time": 0,
+                                "media": ["image.png", "audio.mp3"],
+                                "answered": false
+                            },
+                            {
+                                "text": "Test Question 2",
+                                "answer": "Test Answer",
+                                "value": 200,
+                                "time": 0,
+                                "media": ["video.mp4"],
+                                "answered": false
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+        expect(validateMediaFiles(boards, mediaFolder))
+            .toEqual(["image.png", "audio.mp3", "video.mp4"]);
     });
 });

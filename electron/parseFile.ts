@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { Board, Category, Question } from '../shared/board';
+import { Board, Category, Question, basename } from '../shared/board';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -127,7 +127,7 @@ export function validateMediaFiles(boards: Board[], mediaFolder: string): string
             category.questions.forEach(question => {
                 question.media.forEach(filename => {
                     const path = join(mediaFolder, filename);
-                    if (!existsSync(path)) missing.push(path);
+                    if (!existsSync(path)) missing.push(basename(path));
                 });
             });
         });
