@@ -9,6 +9,9 @@ interface ElectronAPI {
     validateMediaFiles: (boards: Board[], mediaFolder: string) => Promise<string[]>;
     sendAudienceState: (state: AudienceState) => void;
     recvAudienceState: (callback: (state: AudienceState) => void) => void;
+    sendAudiencePause: (paused: boolean) => void;
+    recvAudiencePause: (callback: (paused: boolean) => void) => void;
+    offAudiencePause: () => void;
 }
 
 declare interface Window {

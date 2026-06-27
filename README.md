@@ -44,6 +44,7 @@ npm run build
 ├── index.html                              HTML entry point, loads renderer
 ├── package-lock.json
 ├── package.json
+├── settings.json                           Default game settings
 ├── tsconfig.json                           TypeScript compiler configuration
 └── vite.config.js                          Vite build config (SolidJS + Electron plugins)
 ```

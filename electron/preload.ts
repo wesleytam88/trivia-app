@@ -22,4 +22,16 @@ contextBridge.exposeInMainWorld('api', {
     recvAudienceState: (callback: (state: AudienceState) => void): void => {
         ipcRenderer.on('audience-state', (_event, state) => callback(state));
     },
+
+    // Host -> Main -> Audience pause/resume relay
+    sendAudiencePause: (paused: boolean): void => 
+        ipcRenderer.send('audience-pause', paused),
+
+    recvAudiencePause: (callback: (paused: boolean) => void): void => {
+        ipcRenderer.on('audience-pause', (_event, paused) => callback(paused));
+    },
+
+    offAudiencePause: (): void => {
+        ipcRenderer.removeAllListeners('audience-pause');
+    },
 });

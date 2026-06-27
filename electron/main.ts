@@ -106,6 +106,12 @@ ipcMain.on('audience-state', (_event, state) => {
         audienceWin.webContents.send('audience-state', state);
 });
 
+// Relay pause/resume from host to audience window
+ipcMain.on('audience-pause', (_event, paused: boolean) => {
+    if (audienceWin && !audienceWin.isDestroyed())
+        audienceWin.webContents.send('audience-pause', paused);
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });

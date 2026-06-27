@@ -1,0 +1,130 @@
+import { createSignal, onCleanup, onMount, For, Show } from "solid-js";
+
+interface QuestionAudienceViewProps {
+    categoryName: string;
+    questionText: string;
+    media: string[];
+    /** Total timer duration in seconds. Audience drives its own countdown from mount time */
+    totalDuration: number;
+}
+
+/** Classify a media filename or URL by what kind of element it needs */
+function mediaType(src: string): "image" | "video" | "audio" {
+    const ext = src.split(".").pop()?.toLocaleLowerCase() ?? "";
+    if (["mp4", "mov"].includes(ext)) return "video";
+    if (["mp3", "wav"].includes(ext)) return "audio";
+    return "image";
+}
+
+export function QuestionAudienceView(props: QuestionAudienceViewProps) {
+    // fraction: 0 = full time remaining (invisible bar), 1 = time up (bar full width)
+    const [timerFraction, setTimerFraction] = createSignal(0);
+
+    const totalMs = props.totalDuration * 1000;
+    /** Accumulated elapsed time before an impending pause */
+    let elapsedBeforePause = 0;
+    /** performance.now() when current unpaused segment began */
+    let segmentStart: number;
+    let rafId: number;
+    let isPaused = false;
+
+    // Collect media element refs so we can pause/unpause them
+    const mediaRefs: HTMLMediaElement[] = [];
+
+    function tick(now: number) {
+        const elapsed = elapsedBeforePause + (now - segmentStart);
+        const fraction = Math.min(elapsed / totalMs, 1);
+        setTimerFraction(fraction);
+        if (fraction < 1) {
+            rafId = requestAnimationFrame(tick);
+        }
+    }
+
+    function startLoop() {
+        segmentStart = performance.now();
+        rafId = requestAnimationFrame(tick);
+    }
+
+    onMount(() => {
+        startLoop();
+
+        window.api.recvAudiencePause((paused: boolean) => {
+            if (paused && !isPaused) {
+                isPaused = true;
+                cancelAnimationFrame(rafId);
+                // Accumulate elapsed time from this segment
+                elapsedBeforePause += performance.now() - segmentStart;
+                // Pause all media elements
+                mediaRefs.forEach(el => el.pause())
+            } else if (!paused && isPaused) {
+                isPaused = false;
+                // Play all media elements
+                mediaRefs.forEach(el => el.play());
+                // Start a new segment from now
+                startLoop();
+            }
+        });
+    });
+
+    onCleanup(() => {
+        cancelAnimationFrame(rafId);
+        window.api.offAudiencePause();
+    });
+
+    const visualMedia = () => props.media.filter(m => mediaType(m) !== "audio");
+    const audioMedia = () => props.media.filter(m => mediaType(m) === "audio");
+
+    return (
+        <div>
+            {/* Category banner */}
+            <div>
+                <span>{props.categoryName}</span>
+            </div>
+
+            {/* Question Text */}
+            <div>
+                <span>{props.questionText}</span>
+            </div>
+
+            {/* Visual Media */}
+            <For each={visualMedia()}>
+                {src => (
+                    <Show 
+                        when={mediaType(src) === "video"} 
+                        fallback={<img src={`media://${src}`}/>}
+                    >
+                        <video 
+                            src={`media://${src}`}
+                            autoplay
+                            loop
+                            ref={el => mediaRefs.push(el)}
+                        />
+                    </Show>
+                )}
+            </For>
+
+            {/* Audio media, play automatically */}
+            <For each={audioMedia()}>
+                {src => (
+                    <audio 
+                        src={`media://${src}`}
+                        autoplay
+                        ref={el => mediaRefs.push(el)}
+                    />
+                )}
+            </For>
+
+            {/* Timer bar */}
+            <div>
+                <div 
+                    style={{
+                        height: "8px",
+                        width: `${timerFraction() * 100}%`,
+                        margin: "0 auto",
+                        background: "red"
+                    }}
+                />
+            </div>
+        </div>
+    );
+}

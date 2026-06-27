@@ -1,6 +1,6 @@
 import { createSignal, Switch, Match, onMount } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
-import { GameState, AudienceState } from "../shared/game";
+import { GameState, AudienceState, QuestionResult } from "../shared/game";
 import { Board, Category, Question } from "../shared/board";
 import { Player } from "../shared/player";
 import { PlayerList } from "./components/PlayerList";
@@ -8,7 +8,10 @@ import { StartScreen } from "./components/StartScreen";
 import { AddPlayers } from "./components/AddPlayers";
 import { SelectBoardFiles } from "./components/SelectBoardFiles";
 import { BoardHostView } from "./components/BoardHostView";
+import { QuestionHostView } from "./components/QuestionHostView";
 import { AudienceApp } from "./components/AudienceApp";
+
+import settings from "../settings.json";
 
 const windowType = new URLSearchParams(window.location.search).get("window");
 
@@ -26,6 +29,10 @@ function defaultAudienceState(state: GameState, boards?: Board[], boardIndex?: n
                 return { screen: "Text", text: "No board loaded" };
             // unwrap strips SolidJS store Proxy so object can be structure-cloned across Electron IPC
             return { screen: "AudienceBoardView", board: unwrap(board) };
+        case "QuestionView":
+            // Audience state for QuestionView is sent directly in handleSelectQuestion()
+            // not through syncAudienceView() because it carrier per-question data
+            return { screen: "Text", text: "Question State" }
         case "FinalScores":
             // TODO: Implement final scores
             return { screen: "Text", text: "Final Scores"}
@@ -45,6 +52,11 @@ export const App = () => {
     const [mediaFolder, setMediaFolder] = createSignal<string | null>(null);
     const [boards, setBoards] = createStore<Board[]>([]);
     const [currBoardIndex, setCurrBoardIndex] = createSignal(0);
+    const [selectedQuestion, setSelectedQuestion] = createSignal<{
+        boardIdx: number,
+        catIdx: number,
+        qIdx: number
+    } | null>(null);
 
     // Send initial state so the audience window gets it on startup
     onMount(() => window.api.sendAudienceState(defaultAudienceState(gameState())));
@@ -64,23 +76,52 @@ export const App = () => {
 
     /** Logic to handle clicking on a question cell */
     function handleSelectQuestion(categoryIndex: number, questionIndex: number) {
-        const boardIndx = currBoardIndex();
-        setBoards(boardIndx, "categories", categoryIndex, "questions", questionIndex, "answered", true);
-        syncAudienceWindow();
+        const boardIdx = currBoardIndex();
+        const category = boards[boardIdx].categories[categoryIndex];
+        const question = category.questions[questionIndex];
+        const totalDuration = settings.BASE_TIME + question.time;
+
+        setSelectedQuestion({ boardIdx, catIdx: categoryIndex, qIdx: questionIndex});
+        setGameState("QuestionView");
+
+        // Send audience state directly
+        // Carries question-unique data not available via syncAudienceWindow()
+        window.api.sendAudienceState({
+            screen: "AudienceQuestionView",
+            categoryName: category.name,
+            questionText: question.text,
+            media: unwrap(question.media),
+            totalDuration
+        });
+    }
+
+    /** Logic to handle when a question ends */
+    function handleQuestionDone(_result: QuestionResult) {
+        const sel = selectedQuestion();
+        if (!sel) return;
+
+        const { boardIdx, catIdx, qIdx } = sel;
+
+        setBoards(boardIdx, "categories", catIdx, "questions", qIdx, "answered", true);
+        setSelectedQuestion(null);
 
         // Check if all questions on the current board are answered
-        const board = boards[boardIndx];
+        const board = boards[boardIdx];
         const allAnswered = board.categories.every((cat: Category) => 
             cat.questions.every((q: Question) => q.answered)
         );
 
         if (allAnswered) {
-            if (boardIndx + 1 < boards.length) {
-                setCurrBoardIndex(boardIndx + 1);
-                syncAudienceWindow();
+            // Move to next board or final scores screen
+            if (boardIdx + 1 < boards.length) {
+                setCurrBoardIndex(boardIdx + 1);
+                changeState("BoardView");
             } else {
                 changeState("FinalScores");
             }
+        } else {
+            // Redisplay the board grid
+            changeState("BoardView");
         }
     }
 
@@ -116,6 +157,22 @@ export const App = () => {
                         board={boards[currBoardIndex()]}
                         onSelectQuestion={handleSelectQuestion}
                     />
+                </Match>
+
+                <Match when={gameState() === "QuestionView" && selectedQuestion()}>
+                    {(sel) => {
+                        const { boardIdx, catIdx, qIdx } = sel();
+                        const category = boards[boardIdx].categories[catIdx];
+                        const question = category.questions[qIdx];
+                        return (
+                            <QuestionHostView
+                                categoryName={category.name}
+                                question={question}
+                                totalDuration={settings.BASE_TIME + question.time}
+                                onDone={handleQuestionDone}
+                            />
+                        );
+                    }}
                 </Match>
 
                 <Match when={gameState() === "FinalScores"}>
