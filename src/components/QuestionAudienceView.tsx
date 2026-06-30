@@ -26,7 +26,7 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
     /** performance.now() when current unpaused segment began */
     let segmentStart: number;
     let rafId: number;
-    let isPaused = false;
+    const [isPaused, setIsPaused] = createSignal(false);
 
     // Collect media element refs so we can pause/unpause them
     const mediaRefs: HTMLMediaElement[] = [];
@@ -49,15 +49,15 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
         startLoop();
 
         window.api.recvAudiencePause((paused: boolean) => {
-            if (paused && !isPaused) {
-                isPaused = true;
+            if (paused && !isPaused()) {
+                setIsPaused(true);
                 cancelAnimationFrame(rafId);
                 // Accumulate elapsed time from this segment
                 elapsedBeforePause += performance.now() - segmentStart;
                 // Pause all media elements
                 mediaRefs.forEach(el => el.pause())
-            } else if (!paused && isPaused) {
-                isPaused = false;
+            } else if (!paused && isPaused()) {
+                setIsPaused(false);
                 // Play all media elements
                 mediaRefs.forEach(el => el.play());
                 // Start a new segment from now
@@ -76,54 +76,64 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
 
     return (
         <div>
-            {/* Category banner */}
-            <div>
-                <span>{props.categoryName}</span>
-            </div>
+            {/* Pause overlay, question content stays mounted underneath */}
+            <Show when={isPaused()}>
+                <div>
+                    <span>Game paused</span>
+                </div>
+            </Show>
 
-            {/* Question Text */}
-            <div>
-                <span>{props.questionText}</span>
-            </div>
+            {/* Question content - not mounted to preserve timer/media state */}
+            <div style={{ display: isPaused() ? "none" : undefined }}>
+                {/* Category banner */}
+                <div>
+                    <span>{props.categoryName}</span>
+                </div>
 
-            {/* Visual Media */}
-            <For each={visualMedia()}>
-                {src => (
-                    <Show 
-                        when={mediaType(src) === "video"} 
-                        fallback={<img src={`media://${src}`}/>}
-                    >
-                        <video 
+                {/* Question Text */}
+                <div>
+                    <span>{props.questionText}</span>
+                </div>
+
+                {/* Visual Media */}
+                <For each={visualMedia()}>
+                    {src => (
+                        <Show 
+                            when={mediaType(src) === "video"} 
+                            fallback={<img src={`media://${src}`}/>}
+                        >
+                            <video 
+                                src={`media://${src}`}
+                                autoplay
+                                loop
+                                ref={el => mediaRefs.push(el)}
+                            />
+                        </Show>
+                    )}
+                </For>
+
+                {/* Audio media, play automatically */}
+                <For each={audioMedia()}>
+                    {src => (
+                        <audio 
                             src={`media://${src}`}
                             autoplay
-                            loop
                             ref={el => mediaRefs.push(el)}
                         />
-                    </Show>
-                )}
-            </For>
+                    )}
+                </For>
 
-            {/* Audio media, play automatically */}
-            <For each={audioMedia()}>
-                {src => (
-                    <audio 
-                        src={`media://${src}`}
-                        autoplay
-                        ref={el => mediaRefs.push(el)}
+                {/* Timer bar */}
+                <div>
+                    <div 
+                        style={{
+                            height: "8px",
+                            width: `${timerFraction() * 100}%`,
+                            margin: "0 auto",
+                            background: "red"
+                        }}
                     />
-                )}
-            </For>
-
-            {/* Timer bar */}
-            <div>
-                <div 
-                    style={{
-                        height: "8px",
-                        width: `${timerFraction() * 100}%`,
-                        margin: "0 auto",
-                        background: "red"
-                    }}
-                />
+                </div>
             </div>
         </div>
     );
