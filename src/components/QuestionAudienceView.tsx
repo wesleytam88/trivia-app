@@ -100,10 +100,10 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
                     {src => (
                         <Show 
                             when={mediaType(src) === "video"} 
-                            fallback={<img src={`media://${src}`}/>}
+                            fallback={<img src={`media://media/${src}`}/>}
                         >
                             <video 
-                                src={`media://${src}`}
+                                src={`media://media/${src}`}
                                 autoplay
                                 loop
                                 ref={el => mediaRefs.push(el)}
@@ -116,7 +116,7 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
                 <For each={audioMedia()}>
                     {src => (
                         <audio 
-                            src={`media://${src}`}
+                            src={`media://media/${src}`}
                             autoplay
                             ref={el => mediaRefs.push(el)}
                         />

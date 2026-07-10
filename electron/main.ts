@@ -1,5 +1,7 @@
-import { join } from 'path';
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { join, resolve } from 'path';
+import { pathToFileURL } from 'url';
+import { statSync } from 'fs';
+import { app, BrowserWindow, ipcMain, dialog, protocol, net } from 'electron';
 import { Board } from '../shared/board';
 import { parseQuestionFile, validateMediaFiles } from './parseFile';
 
@@ -9,6 +11,18 @@ process.env.DIST = join(__dirname, '../dist');
 // Performance impact is negligible for this app
 app.disableHardwareAcceleration();
 
+// Register "media://" as a priviledged scheme before app is ready
+protocol.registerSchemesAsPrivileged([{
+    scheme: 'media',
+    privileges: {
+        supportFetchAPI: true,      // allows net.fetch to serve responses
+        bypassCSP: true,            // allows <img>/<video>/<audio> to load the custom scheme
+        stream: true
+    }
+}]);
+
+/** Absolute path to the user-selected media folder, set via the folder dialog */
+let mediaFolderPath: string | null = null;
 let hostWin: BrowserWindow | null;
 let audienceWin: BrowserWindow | null;
 
@@ -77,7 +91,9 @@ ipcMain.handle('select-media-folder', async () => {
     });
 
     if (result.canceled || result.filePaths.length !== 1) return null;
-    return result.filePaths[0];
+    
+    mediaFolderPath = result.filePaths[0];
+    return mediaFolderPath;
 });
 
 // IPC handlers for reading and validating files
@@ -117,6 +133,36 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
+    // Serve the media files from the user-selected folder via media:// URLs
+    // The renderer constructs URLs like media://filename.jpg
+    // The hostname portion of the URL becomes the filename after parsing
+    protocol.handle('media', async (request) => {
+        if (!mediaFolderPath)
+            return new Response('No media folder selected', { status: 404 });
+
+        // Extract the filename from the URL
+        const url = new URL(request.url);
+        const filename = decodeURIComponent(url.pathname.replace(/^\//, ''));
+
+        // Resolve to an absolute path and verify it's inside the media folder
+        // to prevent path-traversal attacks
+        const resolved = resolve(mediaFolderPath, filename);
+        if (!resolved.startsWith(resolve(mediaFolderPath)))
+            return new Response('Forbidden', { status: 403 });
+
+        // net.fetch with file:// handles MIME detection automatically
+        const response = await net.fetch(pathToFileURL(resolved).toString());
+
+        const size = statSync(resolved).size;
+        const headers = new Headers(response.headers);
+        headers.set('Content-Length', String(size));
+
+        return new Response(response.body, {
+            status: response.status,
+            headers: headers
+        });
+    });
+
     createWindows();
 
     app.on('activate', function () {
