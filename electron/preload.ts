@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld('api', {
     validateMediaFiles: (boards: Board[], mediaFolder: string): Promise<string[]> =>
         ipcRenderer.invoke('validate-media-files', boards, mediaFolder),
 
+    getMediaPort: (): Promise<number | null> =>
+        ipcRenderer.invoke('get-media-port'),
+
     // Host -> Main -> Audience state relay
     sendAudienceState: (state: AudienceState): void =>
         ipcRenderer.send('audience-state', state),

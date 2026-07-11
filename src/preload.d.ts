@@ -7,6 +7,7 @@ interface ElectronAPI {
     selectMediaFolder: () => Promise<string | null>;
     parseQuestionFile: (filePath: string) => Promise<ParseResult>;
     validateMediaFiles: (boards: Board[], mediaFolder: string) => Promise<string[]>;
+    getMediaPort: () => Promise<number |null>;
     sendAudienceState: (state: AudienceState) => void;
     recvAudienceState: (callback: (state: AudienceState) => void) => void;
     sendAudiencePause: (paused: boolean) => void;

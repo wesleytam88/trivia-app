@@ -1,7 +1,7 @@
-import { join, resolve } from 'path';
-import { pathToFileURL } from 'url';
-import { statSync } from 'fs';
-import { app, BrowserWindow, ipcMain, dialog, protocol, net } from 'electron';
+import { join, resolve, extname } from 'path';
+import { createReadStream, statSync } from 'fs';
+import { createServer, type Server } from 'http';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { Board } from '../shared/board';
 import { parseQuestionFile, validateMediaFiles } from './parseFile';
 
@@ -11,18 +11,21 @@ process.env.DIST = join(__dirname, '../dist');
 // Performance impact is negligible for this app
 app.disableHardwareAcceleration();
 
-// Register "media://" as a priviledged scheme before app is ready
-protocol.registerSchemesAsPrivileged([{
-    scheme: 'media',
-    privileges: {
-        supportFetchAPI: true,      // allows net.fetch to serve responses
-        bypassCSP: true,            // allows <img>/<video>/<audio> to load the custom scheme
-        stream: true
-    }
-}]);
+/** MIME types for media files this app supports */
+const MIME_TYPES: Record<string, string> = {
+    '.jpg': 'image/jpg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.mp3': 'audio/mpeg',
+    '.wav': 'audio/wav',
+    '.mp4': 'video/mp4',
+    '.mov': 'video/quicktime',
+};
 
 /** Absolute path to the user-selected media folder, set via the folder dialog */
 let mediaFolderPath: string | null = null;
+let mediaServer: Server | null = null;
+let mediaServerPort: number | null = null;
 let hostWin: BrowserWindow | null;
 let audienceWin: BrowserWindow | null;
 
@@ -113,8 +116,10 @@ ipcMain.handle('validate-media-files', async (_event, boards: Board[], mediaFold
         const message = err instanceof Error ? err.message : String(err);
         return ["ERROR!!!!", message]
     }
-    
 });
+
+// Return the medai server port so the renderer can build media URLs
+ipcMain.handle('get-media-port', () => mediaServerPort);
 
 // Relay audience state from host to audience window
 ipcMain.on('audience-state', (_event, state) => {
@@ -133,34 +138,67 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
-    // Serve the media files from the user-selected folder via media:// URLs
-    // The renderer constructs URLs like media://filename.jpg
-    // The hostname portion of the URL becomes the filename after parsing
-    protocol.handle('media', async (request) => {
-        if (!mediaFolderPath)
-            return new Response('No media folder selected', { status: 404 });
+    mediaServer = createServer((req, res) => {
+        if (!mediaFolderPath || !req.url) {
+            res.writeHead(404).end();
+            return;
+        }
 
-        // Extract the filename from the URL
-        const url = new URL(request.url);
-        const filename = decodeURIComponent(url.pathname.replace(/^\//, ''));
+        const filename = decodeURIComponent(req.url.replace(/^\//, ''));
 
-        // Resolve to an absolute path and verify it's inside the media folder
-        // to prevent path-traversal attacks
+        // Path traversal guard
         const resolved = resolve(mediaFolderPath, filename);
-        if (!resolved.startsWith(resolve(mediaFolderPath)))
-            return new Response('Forbidden', { status: 403 });
+        if (!resolved.startsWith(resolve(mediaFolderPath))) {
+            res.writeHead(403).end();
+            return;
+        }
 
-        // net.fetch with file:// handles MIME detection automatically
-        const response = await net.fetch(pathToFileURL(resolved).toString());
+        let stat;
+        try {
+            stat = statSync(resolved);
+        } catch {
+            res.writeHead(404).end();
+            return;
+        }
 
-        const size = statSync(resolved).size;
-        const headers = new Headers(response.headers);
-        headers.set('Content-Length', String(size));
+        const totalSize = stat.size;
+        const mimeType = MIME_TYPES[extname(resolved).toLowerCase()] ?? 'application/octet-stream';
 
-        return new Response(response.body, {
-            status: response.status,
-            headers: headers
+        // Handle range requests (required for <video> playback)
+        const rangeHeader = req.headers.range;
+        if (rangeHeader) {
+            const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+            const start = match ? parseInt(match[1], 10) : 0;
+            const end = match && match[2] ? parseInt(match[2], 10) : totalSize - 1;
+
+            if (start >= totalSize) {
+                res.writeHead(416, { 'Content-Range': `bytes */${totalSize}` }).end();
+                return;
+            }
+
+            res.writeHead(206, {
+                'Content-Type': mimeType,
+                'Content-Length': end - start + 1,
+                'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+                'Accept-Ranges': `bytes`,
+            });
+            createReadStream(resolved, { start, end }).pipe(res);
+            return;
+        }
+
+        res.writeHead(200, {
+            'Content-Type': mimeType,
+            'Content-Length': totalSize,
+            'Accept-Ranges': 'bytes',
         });
+        createReadStream(resolved).pipe(res);
+    });
+
+    // Listen on a ranodm available port (port 0), localhost only
+    mediaServer.listen(0, '127.0.0.1', () => {
+        const addr = mediaServer!.address();
+        if (addr && typeof addr !== 'string')
+            mediaServerPort = addr.port;
     });
 
     createWindows();

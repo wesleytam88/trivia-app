@@ -17,6 +17,13 @@ function mediaType(src: string): "image" | "video" | "audio" {
 }
 
 export function QuestionAudienceView(props: QuestionAudienceViewProps) {
+    // Media server port (fetched on mount) used to build http://localhost:PORT/filename URLs
+    const [mediaPort, setMediaPort] = createSignal<number | null>(null);
+    const mediaUrl = (filename: string)=> {
+        const port = mediaPort();
+        return port ? `http://127.0.0.1:${port}/${encodeURIComponent(filename)}` : '';
+    }
+
     // fraction: 0 = full time remaining (invisible bar), 1 = time up (bar full width)
     const [timerFraction, setTimerFraction] = createSignal(0);
 
@@ -46,6 +53,7 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
     }
 
     onMount(() => {
+        window.api.getMediaPort().then(port => setMediaPort(port));
         startLoop();
 
         window.api.recvAudiencePause((paused: boolean) => {
@@ -100,10 +108,10 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
                     {src => (
                         <Show 
                             when={mediaType(src) === "video"} 
-                            fallback={<img src={`media://media/${src}`}/>}
+                            fallback={<img src={mediaUrl(src)}/>}
                         >
                             <video 
-                                src={`media://media/${src}`}
+                                src={mediaUrl(src)}
                                 autoplay
                                 loop
                                 ref={el => mediaRefs.push(el)}
@@ -116,7 +124,7 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
                 <For each={audioMedia()}>
                     {src => (
                         <audio 
-                            src={`media://media/${src}`}
+                            src={mediaUrl(src)}
                             autoplay
                             ref={el => mediaRefs.push(el)}
                         />
