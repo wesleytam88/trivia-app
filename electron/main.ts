@@ -195,13 +195,15 @@ app.whenReady().then(() => {
     });
 
     // Listen on a ranodm available port (port 0), localhost only
+    // Windows are created inside the callback so the port is known before any page loads
+    // Content-Security-Policy set in index.html
     mediaServer.listen(0, '127.0.0.1', () => {
         const addr = mediaServer!.address();
         if (addr && typeof addr !== 'string')
             mediaServerPort = addr.port;
-    });
 
-    createWindows();
+        createWindows();
+    });
 
     app.on('activate', function () {
         // On macOS it's common to re-create a window in the app when the
