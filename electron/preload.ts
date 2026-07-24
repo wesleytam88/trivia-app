@@ -37,4 +37,17 @@ contextBridge.exposeInMainWorld('api', {
     offAudiencePause: (): void => {
         ipcRenderer.removeAllListeners('audience-pause');
     },
+
+    // Host -> Main -> Audience buzz-in relay
+    // buttonId = string shows overlay, null clears it and resumes
+    sendAudienceBuzzIn: (playerName: string | null): void => 
+        ipcRenderer.send('audience-buzzin', playerName),
+
+    recvAudienceBuzzIn: (callback: (playerName: string | null) => void): void => {
+        ipcRenderer.on('audience-buzzin', (_event, playerName) => callback(playerName));
+    },
+
+    offAudienceBuzzIn: (): void => {
+        ipcRenderer.removeAllListeners('audience-buzzin');
+    },
 });

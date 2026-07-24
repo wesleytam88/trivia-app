@@ -133,6 +133,12 @@ ipcMain.on('audience-pause', (_event, paused: boolean) => {
         audienceWin.webContents.send('audience-pause', paused);
 });
 
+// Relay buzz-in from host to audience window
+ipcMain.on('audience-buzzin', (_event, playerName: string | null) => {
+    if (audienceWin && !audienceWin.isDestroyed())
+        audienceWin.webContents.send('audience-buzzin', playerName);
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });

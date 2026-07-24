@@ -2,6 +2,7 @@ import { createSignal, onMount, Switch, Match } from "solid-js";
 import { AudienceState } from "../../shared/game";
 import { BoardGrid } from "./BoardGrid";
 import { QuestionAudienceView } from "./QuestionAudienceView";
+import { PlayerList } from "./PlayerList";
 
 export function AudienceApp() {
     const [state, setState] = createSignal<AudienceState>({ screen: "Text", text: "Setting up Game" });
@@ -44,6 +45,10 @@ export function AudienceApp() {
                         totalDuration={s().totalDuration}
                     />
                 )}
+            </Match>
+
+            <Match when={screenIs("AudienceScoreboard")}>
+                {s => <PlayerList players={s().players} readonly />}
             </Match>
         </Switch>
     );

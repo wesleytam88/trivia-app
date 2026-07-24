@@ -33,7 +33,11 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
     /** performance.now() when current unpaused segment began */
     let segmentStart: number;
     let rafId: number;
+
+    /** Whether playback is currently frozen (by manual pause or buzz-in) */
     const [isPaused, setIsPaused] = createSignal(false);
+    /** "Game Paused" for manual pause, player name string for buzz-in, null when playing */
+    const [overlayText, setOverlayText] = createSignal<string | null>(null);
 
     // Collect media element refs so we can pause/unpause them
     const mediaRefs: HTMLMediaElement[] = [];
@@ -52,24 +56,48 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
         rafId = requestAnimationFrame(tick);
     }
 
+    /** Freeze timer and media playback */
+    function pausePlayback() {
+        if (isPaused())
+            return;
+        setIsPaused(true);
+        cancelAnimationFrame(rafId);
+        elapsedBeforePause += performance.now() - segmentStart;
+        mediaRefs.forEach(el => el.pause());
+    }
+
+    /** Resume timer and media playback */
+    function resumePlayback() {
+        if (!isPaused())
+            return;
+        setIsPaused(false);
+        mediaRefs.forEach(el => el.play());
+        startLoop();
+    }
+
     onMount(() => {
         window.api.getMediaPort().then(port => setMediaPort(port));
         startLoop();
 
+        // Manual pause/resume from host
         window.api.recvAudiencePause((paused: boolean) => {
-            if (paused && !isPaused()) {
-                setIsPaused(true);
-                cancelAnimationFrame(rafId);
-                // Accumulate elapsed time from this segment
-                elapsedBeforePause += performance.now() - segmentStart;
-                // Pause all media elements
-                mediaRefs.forEach(el => el.pause())
-            } else if (!paused && isPaused()) {
-                setIsPaused(false);
-                // Play all media elements
-                mediaRefs.forEach(el => el.play());
-                // Start a new segment from now
-                startLoop();
+            if (paused) {
+                pausePlayback();
+                setOverlayText("Game Paused");
+            } else {
+                setOverlayText(null);
+                resumePlayback();
+            }
+        });
+
+        // Buzz-in from host. string = show player name, null = clear and resume
+        window.api.recvAudienceBuzzIn((playerName: string | null) => {
+            if (playerName) {
+                pausePlayback();
+                setOverlayText(playerName);
+            } else {
+                setOverlayText(null);
+                resumePlayback();
             }
         });
     });
@@ -77,6 +105,7 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
     onCleanup(() => {
         cancelAnimationFrame(rafId);
         window.api.offAudiencePause();
+        window.api.offAudienceBuzzIn();
     });
 
     const visualMedia = () => props.media.filter(m => mediaType(m) !== "audio");
@@ -84,14 +113,16 @@ export function QuestionAudienceView(props: QuestionAudienceViewProps) {
 
     return (
         <div>
-            {/* Pause overlay, question content stays mounted underneath */}
-            <Show when={isPaused()}>
-                <div>
-                    <span>Game paused</span>
-                </div>
+            {/* Overlay for pause or buzz-in, question content stays mounted underneath */}
+            <Show when={overlayText()}>
+                {text => (
+                    <div>
+                        <span>{text()}</span>
+                    </div>
+                )}
             </Show>
 
-            {/* Question content - not mounted to preserve timer/media state */}
+            {/* Question content, not mounted to preserve timer/media state */}
             <div style={{ display: isPaused() ? "none" : undefined }}>
                 {/* Category banner */}
                 <div>

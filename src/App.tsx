@@ -16,7 +16,7 @@ import settings from "../settings.json";
 const windowType = new URLSearchParams(window.location.search).get("window");
 
 /** Map a GameState to the default AudienceState for that screen. */
-function defaultAudienceState(state: GameState, boards?: Board[], boardIndex?: number): AudienceState {
+function defaultAudienceState(state: GameState, boards?: Board[], boardIndex?: number, players?: Player[]): AudienceState {
     switch (state) {
         case "AddPlayers":
             return { screen: "Text", text: "Adding Players" };
@@ -32,12 +32,15 @@ function defaultAudienceState(state: GameState, boards?: Board[], boardIndex?: n
         case "QuestionView":
             // Audience state for QuestionView is sent directly in handleSelectQuestion()
             // not through syncAudienceView() because it carrier per-question data
-            return { screen: "Text", text: "Question State" }
+            return { screen: "Text", text: "Question State" };
+        case "Scoreboard":
+            // unwrap strips SolidJS store Proxy for IPC
+            return { screen: "AudienceScoreboard", players: unwrap(players ?? []) };
         case "FinalScores":
             // TODO: Implement final scores
-            return { screen: "Text", text: "Final Scores"}
+            return { screen: "Text", text: "Final Scores"};
         default:
-            return { screen: "Text", text: "ERROR: Game state not found!" }
+            return { screen: "Text", text: "ERROR: Game state not found!" };
     }
 }
 
@@ -79,7 +82,7 @@ export const App = () => {
         const boardIdx = currBoardIndex();
         const category = boards[boardIdx].categories[categoryIndex];
         const question = category.questions[questionIndex];
-        const totalDuration = settings.BASE_TIME + question.time;
+        const totalDuration = settings.BASE_QUESTION_TIME_SECONDS + question.time;
 
         setSelectedQuestion({ boardIdx, catIdx: categoryIndex, qIdx: questionIndex});
         setGameState("QuestionView");
@@ -95,8 +98,34 @@ export const App = () => {
         });
     }
 
+    /** Update a player's score */
+    function handleScoreChange(playerIndex: number, change: number) {
+        setPlayers(playerIndex, "points", prev => prev + change);
+    }
+
+    /** Advance from the current question back to (or to the next) board, or final scres */
+    function advanceFromQuestion(boardIdx: number) {
+        const board = boards[boardIdx];
+        const allAnswered = board.categories.every((cat: Category) => 
+            cat.questions.every((q: Question) => q.answered)
+        );
+
+        if (allAnswered) {
+            if (boardIdx + 1 < boards.length) {
+                // Not the last board
+                setCurrBoardIndex(boardIdx + 1);
+                changeState("BoardView");
+            } else {
+                // Finished last board
+                changeState("FinalScores");
+            }
+        } else {
+            changeState("BoardView");
+        }
+    }
+
     /** Logic to handle when a question ends */
-    function handleQuestionDone(_result: QuestionResult) {
+    function handleQuestionDone(result: QuestionResult) {
         const sel = selectedQuestion();
         if (!sel) return;
 
@@ -105,23 +134,13 @@ export const App = () => {
         setBoards(boardIdx, "categories", catIdx, "questions", qIdx, "answered", true);
         setSelectedQuestion(null);
 
-        // Check if all questions on the current board are answered
-        const board = boards[boardIdx];
-        const allAnswered = board.categories.every((cat: Category) => 
-            cat.questions.every((q: Question) => q.answered)
-        );
-
-        if (allAnswered) {
-            // Move to next board or final scores screen
-            if (boardIdx + 1 < boards.length) {
-                setCurrBoardIndex(boardIdx + 1);
-                changeState("BoardView");
-            } else {
-                changeState("FinalScores");
-            }
+        if (result === "correct") {
+            // Show scoreboard on both windows, then advance
+            const time_ms = settings.SCOREBOARD_TIME_SECONDS * 1000;
+            changeState("Scoreboard");
+            setTimeout(() => advanceFromQuestion(boardIdx), time_ms);
         } else {
-            // Redisplay the board grid
-            changeState("BoardView");
+            advanceFromQuestion(boardIdx);
         }
     }
 
@@ -168,11 +187,18 @@ export const App = () => {
                             <QuestionHostView
                                 categoryName={category.name}
                                 question={question}
-                                totalDuration={settings.BASE_TIME + question.time}
+                                points={question.value}
+                                totalDuration={settings.BASE_QUESTION_TIME_SECONDS + question.time}
+                                players={players}
+                                onScoreChange={handleScoreChange}
                                 onDone={handleQuestionDone}
                             />
                         );
                     }}
+                </Match>
+
+                <Match when={gameState() === "Scoreboard"}>
+                    <PlayerList players={players} readonly />
                 </Match>
 
                 <Match when={gameState() === "FinalScores"}>

@@ -13,6 +13,9 @@ interface ElectronAPI {
     sendAudiencePause: (paused: boolean) => void;
     recvAudiencePause: (callback: (paused: boolean) => void) => void;
     offAudiencePause: () => void;
+    sendAudienceBuzzIn: (playerName: string | null) => void;
+    recvAudienceBuzzIn: (callback: (playerName: string | null) => void) => void;
+    offAudienceBuzzIn: () => void;
 }
 
 declare interface Window {

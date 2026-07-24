@@ -1,6 +1,7 @@
 import { Board } from "./board";
+import { Player } from "./player";
 
-export type QuestionResult = "end"
+export type QuestionResult = "end" | "correct"
 
 export type GameState = 
     | "StartScreen"
@@ -8,6 +9,7 @@ export type GameState =
     | "SelectBoardFiles"
     | "BoardView"
     | "QuestionView"
+    | "Scoreboard"
     | "FinalScores"
 
 /** Discriminated union containing the screen and all the data needed to render that screen */
@@ -22,3 +24,4 @@ export type AudienceState =
         media: string[];
         totalDuration: number;
       }
+    | { screen: "AudienceScoreboard"; players: Player[] }
